@@ -1,0 +1,9 @@
+name = "lifepath-ai-proxy"
+main = "index.ts"
+compatibility_date = "2026-01-01"
+
+[vars]
+# Set to your deployed frontend origin, e.g. "https://lifepath.example.org"
+ALLOWED_ORIGIN = ""
+
+# Secret (never commit): npx wrangler secret put GEMINI_API_KEY
