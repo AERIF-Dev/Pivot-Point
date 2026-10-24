@@ -150,15 +150,15 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
     defs.push({
       id: "later-shift",
       category: "shift",
-      title: (v) => `Ask for a ${formatClock(v)} start`,
+      title: (v) => `Ask to start at ${formatClock(v)}`,
       obstacle: dropoff.detail,
       opportunity: (v) =>
-        `A ${formatClock(v)}–${formatClock(v + length)} shift keeps the same paid hours and fits childcare that opens at ${formatClock(plan.childcareOpen)}.`,
+        `Working ${formatClock(v)}–${formatClock(v + length)} keeps the same paid hours and fits childcare that opens at ${formatClock(plan.childcareOpen)}.`,
       assumptions: [
         "The employer offers or approves a later shift — not guaranteed.",
         "Shift length and pay stay the same.",
       ],
-      nextAction: `Ask whether a ${formatClock(needed)} start (or a later crew) is available for this role before accepting.`,
+      nextAction: `Before accepting, ask whether starting at ${formatClock(needed)} (or joining a later crew) is possible for this role.`,
       param: {
         label: "Shift start time",
         kind: "clock",

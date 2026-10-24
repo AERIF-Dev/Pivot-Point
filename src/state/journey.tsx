@@ -47,7 +47,7 @@ export const JOURNEY_STEPS: JourneyStep[] = [
     path: "/one-change",
     anchor: "changes",
     title: "One Change Away",
-    body: "A higher wage helps the money but not the schedule. An 8 AM start fixes the conflict. Press “Try this change” to see it.",
+    body: "A higher wage helps the money but not the schedule. Starting at 8 AM fixes the conflict. Press “Try this change” to see it.",
   },
 ];
 

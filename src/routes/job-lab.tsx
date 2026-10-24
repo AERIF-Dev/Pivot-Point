@@ -88,7 +88,7 @@ function JobLabPage() {
                   <div className={cn("text-xl font-bold", style.text)}>{VERDICT_LABELS[c.verdict]}</div>
                   {c.verdict === "schedule-conflict" ? (
                     <div className="text-sm font-medium text-foreground">
-                      Financially: {FINANCIAL_VERDICT_LABELS[c.financialVerdict].toLowerCase()}.
+                      Money alone: {FINANCIAL_VERDICT_LABELS[c.financialVerdict]}.
                     </div>
                   ) : null}
                   <p className="max-w-2xl text-sm leading-relaxed text-foreground/85">{c.explanation}</p>

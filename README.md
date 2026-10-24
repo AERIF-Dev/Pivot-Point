@@ -71,7 +71,7 @@ npm run build
 1. Open `/` and click **Try the Live Demo** (or **Try Sample Journey** in the header).
 2. Step through: profile → skills (press **Find my transferable skills**) → Job Lab comparison → hidden costs and the
    6 AM childcare conflict → break-even wage (≈ $24.66/hr, drag the wage slider) → One Change Away (press **Try this
-   change** on "Ask for an 8:00 AM start").
+   change** on "Ask to start at 8:00 AM").
 3. Expected sample results: +$867/mo gross, ≈ +$46/mo remaining after +$630 in new costs, +5 h/week commuting, verdict
    "Scheduling conflict needs resolution".
 
