@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FinancesRouteImport } from './routes/finances'
 import { Route as JobLabRouteImport } from './routes/job-lab'
+import { Route as OneChangeRouteImport } from './routes/one-change'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiAnalyzeRouteImport } from './routes/api/analyze'
@@ -29,6 +30,11 @@ const FinancesRoute = FinancesRouteImport.update({
 const JobLabRoute = JobLabRouteImport.update({
   id: '/job-lab',
   path: '/job-lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OneChangeRoute = OneChangeRouteImport.update({
+  id: '/one-change',
+  path: '/one-change',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
   '/job-lab': typeof JobLabRoute
+  '/one-change': typeof OneChangeRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
   '/job-lab': typeof JobLabRoute
+  '/one-change': typeof OneChangeRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
   '/job-lab': typeof JobLabRoute
+  '/one-change': typeof OneChangeRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
@@ -75,14 +84,28 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/finances' | '/job-lab' | '/profile' | '/skills' | '/api/analyze'
+    | '/'
+    | '/finances'
+    | '/job-lab'
+    | '/one-change'
+    | '/profile'
+    | '/skills'
+    | '/api/analyze'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/finances' | '/job-lab' | '/profile' | '/skills' | '/api/analyze'
+  to:
+    | '/'
+    | '/finances'
+    | '/job-lab'
+    | '/one-change'
+    | '/profile'
+    | '/skills'
+    | '/api/analyze'
   id:
     | '__root__'
     | '/'
     | '/finances'
     | '/job-lab'
+    | '/one-change'
     | '/profile'
     | '/skills'
     | '/api/analyze'
@@ -92,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FinancesRoute: typeof FinancesRoute
   JobLabRoute: typeof JobLabRoute
+  OneChangeRoute: typeof OneChangeRoute
   ProfileRoute: typeof ProfileRoute
   SkillsRoute: typeof SkillsRoute
   ApiAnalyzeRoute: typeof ApiAnalyzeRoute
@@ -118,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/job-lab'
       fullPath: '/job-lab'
       preLoaderRoute: typeof JobLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/one-change': {
+      id: '/one-change'
+      path: '/one-change'
+      fullPath: '/one-change'
+      preLoaderRoute: typeof OneChangeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -148,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FinancesRoute: FinancesRoute,
   JobLabRoute: JobLabRoute,
+  OneChangeRoute: OneChangeRoute,
   ProfileRoute: ProfileRoute,
   SkillsRoute: SkillsRoute,
   ApiAnalyzeRoute: ApiAnalyzeRoute,
