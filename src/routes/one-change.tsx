@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Bot, CheckCircle2, Clock, FlaskConical, ListChecks, RotateCcw, Sparkles, Unlock, Wallet, Zap } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { AiAction, AiResultMeta } from "@/components/lifepath/ai";
 import { PageBody, PageHeader, Panel } from "@/components/lifepath/blocks";
@@ -65,12 +65,22 @@ function OneChangePage() {
   const base = useMemo(() => scenarioOutcome(data), [data]);
   const applied = data.appliedChanges;
 
+  const [drafts, setDrafts] = useState<Record<string, number>>({});
   const evaluated = useMemo(
-    () => defs.map((d) => evaluateChange(data, d, applied[d.id] ?? d.param.defaultValue, base)),
-    [defs, data, applied, base],
+    () => defs.map((d) => evaluateChange(data, d, applied[d.id] ?? drafts[d.id] ?? d.param.defaultValue, base)),
+    [defs, data, applied, drafts, base],
   );
-  const top = useMemo(() => pickTopChanges(evaluated), [evaluated]);
-  const others = evaluated.filter((e) => !top.includes(e));
+  // Rank once on default values so cards don't reorder while sliders move.
+  const topIds = useMemo(
+    () => pickTopChanges(defs.map((d) => evaluateChange(data, d, d.param.defaultValue, base))).map((e) => e.def.id),
+    [defs, data, base],
+  );
+  const top = topIds.map((id) => evaluated.find((e) => e.def.id === id)!).filter(Boolean);
+  const others = evaluated.filter((e) => !topIds.includes(e.def.id));
+  const onValue = (id: string, v: number) => {
+    if (id in applied) setApplied(id, v);
+    else setDrafts((d) => ({ ...d, [id]: v }));
+  };
   const scenario = useMemo(() => scenarioOutcome(applyChanges(data, applied, defs)), [data, applied, defs]);
   const appliedCount = Object.keys(applied).filter((id) => defs.some((d) => d.id === id)).length;
 
@@ -118,7 +128,7 @@ function OneChangePage() {
           ) : (
             <div className="grid gap-4 lg:grid-cols-3">
               {top.map((e, i) => (
-                <ChangeCard key={e.def.id} e={e} rank={i + 1} applied={e.def.id in applied} onApply={(v) => setApplied(e.def.id, v)} />
+                <ChangeCard key={e.def.id} e={e} rank={i + 1} applied={e.def.id in applied} onApply={(v) => setApplied(e.def.id, v)} onValue={(v) => onValue(e.def.id, v)} />
               ))}
             </div>
           )}
@@ -132,7 +142,7 @@ function OneChangePage() {
               </summary>
               <div className="mt-4 grid gap-4 lg:grid-cols-3">
                 {others.map((e) => (
-                  <ChangeCard key={e.def.id} e={e} applied={e.def.id in applied} onApply={(v) => setApplied(e.def.id, v)} />
+                  <ChangeCard key={e.def.id} e={e} applied={e.def.id in applied} onApply={(v) => setApplied(e.def.id, v)} onValue={(v) => onValue(e.def.id, v)} />
                 ))}
               </div>
             </details>
@@ -343,7 +353,7 @@ function ChangeCard({
           max={Math.max(p.max, p.min + p.step)}
           step={p.step}
           value={[value]}
-          onValueChange={([v]) => onApply(v)}
+          onValueChange={([v]) => onValue(v)}
         />
       </div>
 
