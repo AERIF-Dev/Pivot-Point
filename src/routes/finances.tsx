@@ -19,12 +19,12 @@ import { useLifePath } from "@/state/lifepath-store";
 export const Route = createFileRoute("/finances")({
   head: () => ({
     meta: [
-      { title: "Financial & Time Dashboard | LifePath AI" },
+      { title: "Financial & Time Dashboard | PivotPoint" },
       {
         name: "description",
         content: "See monthly income, estimated spendable pay, expenses, remaining funds, and weekly work-plus-commute time.",
       },
-      { property: "og:title", content: "Financial & Time Dashboard — LifePath AI" },
+      { property: "og:title", content: "Financial & Time Dashboard — PivotPoint" },
       { property: "og:description", content: "An honest view of your money and your time, with every assumption visible." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -68,7 +68,7 @@ function FinancesPage() {
         stage={3}
         eyebrow="Financial & Time Dashboard"
         title="Understand your real finances and schedule"
-        description="Every number below is calculated by LifePath — not by AI — and updates as you type."
+        description="Every number below is calculated by PivotPoint — not by AI — and updates as you type."
       />
       <PageBody>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

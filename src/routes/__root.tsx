@@ -85,14 +85,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LifePath AI — Better decisions. Better opportunities. Better lives." },
+      { title: "PivotPoint — Find the change that changes everything." },
       {
         name: "description",
         content:
-          "LifePath AI connects your skills, income, expenses, schedule, and goals to help you make smarter career and life decisions.",
+          "PivotPoint connects your skills, income, expenses, schedule, and goals to help you make smarter career and life decisions.",
       },
-      { name: "author", content: "LifePath AI" },
-      { property: "og:title", content: "LifePath AI" },
+      { name: "author", content: "PivotPoint" },
+      { property: "og:title", content: "PivotPoint" },
       {
         property: "og:description",
         content: "A better job doesn't always mean a better life. Compare real costs, schedules, and transferable skills.",

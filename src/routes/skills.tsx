@@ -14,12 +14,12 @@ import { useAiOperation } from "@/state/use-ai";
 export const Route = createFileRoute("/skills")({
   head: () => ({
     meta: [
-      { title: "Skills Explorer — Transferable skills | LifePath AI" },
+      { title: "Skills Explorer — Transferable skills | PivotPoint" },
       {
         name: "description",
         content: "Gemma 4 reads the tasks you've actually done and maps them to related career paths, gaps, and next learning steps.",
       },
-      { property: "og:title", content: "Skills Explorer — LifePath AI" },
+      { property: "og:title", content: "Skills Explorer — PivotPoint" },
       { property: "og:description", content: "Discover the transferable skills hiding in your work history." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,7 +51,7 @@ function SkillsPage() {
         <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary-soft p-4 text-sm text-accent-foreground">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <p>
-            <strong className="font-semibold">AI-suggested directions are not job offers.</strong> LifePath does not list
+            <strong className="font-semibold">AI-suggested directions are not job offers.</strong> PivotPoint does not list
             openings, salaries, or employers, and never decides whether you qualify for a role. Verify requirements with
             employers or local workforce services.
           </p>
@@ -73,7 +73,7 @@ function SkillsPage() {
             onFixture={data.isSample ? () => skillsOp.useFixture(fixtures.extract_skills) : undefined}
             privacyNote={hasWork ? PRIVACY : (
               <>
-                Add your tasks on <Link to="/profile" className="font-medium text-primary underline-offset-4 hover:underline">My LifePath</Link> first.
+                Add your tasks on <Link to="/profile" className="font-medium text-primary underline-offset-4 hover:underline">My Profile</Link> first.
               </>
             )}
           />

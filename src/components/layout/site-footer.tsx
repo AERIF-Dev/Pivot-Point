@@ -55,9 +55,9 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3 lg:px-8">
         <div className="space-y-2">
           <div className="text-lg font-bold">
-            LifePath <span className="text-primary">AI</span>
+            Pivot<span className="text-primary">Point</span>
           </div>
-          <p className="text-sm text-navy-muted">Better decisions. Better opportunities. Better lives.</p>
+          <p className="text-sm text-navy-muted">Find the change that changes everything.</p>
         </div>
         <div className="space-y-1 text-sm text-navy-muted">
           <p className="font-medium text-navy-foreground">Built for Hack for Humanity Detroit 2026</p>

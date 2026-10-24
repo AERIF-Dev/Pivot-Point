@@ -21,13 +21,13 @@ import { useJourney } from "@/state/journey";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "LifePath AI — A better job doesn't always mean a better life" },
+      { title: "PivotPoint — A better job doesn't always mean a better life" },
       {
         name: "description",
         content:
           "Discover transferable skills, compare job offers on real costs and schedules, and find the one change that unlocks a better opportunity.",
       },
-      { property: "og:title", content: "LifePath AI — A better job doesn't always mean a better life" },
+      { property: "og:title", content: "PivotPoint — A better job doesn't always mean a better life" },
       {
         property: "og:description",
         content:
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/")({
 const sample = compareJobs(createSampleData());
 
 const STAGES = [
-  { n: 1, to: "/profile", icon: UserRound, title: "Tell LifePath about yourself", body: "Your jobs, real tasks, tools, pay, and schedule — in a form or your own words." },
+  { n: 1, to: "/profile", icon: UserRound, title: "Tell PivotPoint about yourself", body: "Your jobs, real tasks, tools, pay, and schedule — in a form or your own words." },
   { n: 2, to: "/skills", icon: Lightbulb, title: "Discover transferable skills", body: "Gemma 4 maps the work you've actually done to other career paths." },
   { n: 3, to: "/finances", icon: Wallet, title: "See your real finances & time", body: "Income, expenses, commute, and childcare in one honest dashboard." },
   { n: 4, to: "/job-lab", icon: Scale, title: "Can I actually take this job?", body: "Side-by-side offer comparison with break-even wage and schedule checks." },
@@ -66,13 +66,13 @@ function Home() {
               A better job doesn't always mean a better life.
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-navy-muted">
-              LifePath AI connects your skills, income, expenses, schedule, and goals to help you make smarter career and
+              PivotPoint connects your skills, income, expenses, schedule, and goals to help you make smarter career and
               life decisions.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" variant="hero">
                 <Link to="/profile">
-                  Explore My LifePath <ArrowRight aria-hidden />
+                  Explore My Profile <ArrowRight aria-hidden />
                 </Link>
               </Button>
               <Button size="lg" variant="hero-outline" onClick={journey.start}>

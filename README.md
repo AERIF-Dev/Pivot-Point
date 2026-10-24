@@ -1,8 +1,8 @@
-# LifePath AI
+# PivotPoint
 
-**Better decisions. Better opportunities. Better lives.**
+**Find the change that changes everything.**
 
-LifePath AI helps people make informed career, financial, and life decisions: it surfaces transferable skills,
+PivotPoint helps people make informed career, financial, and life decisions: it surfaces transferable skills,
 compares job offers on real-life costs, finds schedule conflicts, and identifies the single change that could unlock a
 better opportunity.
 

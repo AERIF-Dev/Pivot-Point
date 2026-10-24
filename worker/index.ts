@@ -1,4 +1,4 @@
-// Optional standalone Cloudflare Worker for the LifePath AI proxy.
+// Optional standalone Cloudflare Worker for the PivotPoint proxy.
 //
 // The app's built-in endpoint (src/routes/api/analyze.ts) already runs on
 // Cloudflare-compatible infrastructure. Use this adapter if you want to host the

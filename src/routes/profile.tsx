@@ -14,12 +14,12 @@ import { useLifePath } from "@/state/lifepath-store";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "My LifePath — Tell us about your work | LifePath AI" },
+      { title: "My Profile — Tell us about your work | PivotPoint" },
       {
         name: "description",
         content: "Describe your jobs, real tasks, tools, pay, and schedule. Nothing is required and everything stays on your device.",
       },
-      { property: "og:title", content: "My LifePath — LifePath AI" },
+      { property: "og:title", content: "My Profile — PivotPoint" },
       { property: "og:description", content: "Build your work profile in a guided form or in your own words." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -62,8 +62,8 @@ function ProfilePage() {
       <PageHeader
         id="profile-top"
         stage={1}
-        eyebrow="My LifePath"
-        title="Tell LifePath about yourself"
+        eyebrow="My Profile"
+        title="Tell PivotPoint about yourself"
         description="Share what you actually do at work — not just your job title. Nothing is required; fill in what you can and come back anytime."
         actions={
           <>
@@ -143,7 +143,7 @@ function ProfilePage() {
             <TabsContent value="words" className="space-y-6">
               <Panel
                 title="Describe your work in your own words"
-                description="Talk the way you would to a friend. LifePath's AI reads this together with the form when you ask for skills analysis."
+                description="Talk the way you would to a friend. PivotPoint's AI reads this together with the form when you ask for skills analysis."
                 icon={<MessageSquareText className="h-4 w-4" />}
               >
                 <div className="mb-4 flex flex-wrap gap-2">

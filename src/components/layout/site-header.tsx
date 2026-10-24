@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useJourney } from "@/state/journey";
 
 export const NAV_ITEMS = [
-  { to: "/profile", label: "My LifePath", stage: 1 },
+  { to: "/profile", label: "My Profile", stage: 1 },
   { to: "/skills", label: "Skills", stage: 2 },
   { to: "/finances", label: "Finances & Time", stage: 3 },
   { to: "/job-lab", label: "Job Decision Lab", stage: 4 },
@@ -18,12 +18,12 @@ export const NAV_ITEMS = [
 
 export function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-2 font-bold text-foreground" aria-label="LifePath AI home">
+    <Link to="/" className="flex items-center gap-2 font-bold text-foreground" aria-label="PivotPoint home">
       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy text-navy-foreground">
         <Compass className="h-4.5 w-4.5" aria-hidden />
       </span>
       <span className="text-[17px] tracking-tight">
-        LifePath <span className="text-primary">AI</span>
+        Pivot<span className="text-primary">Point</span>
       </span>
     </Link>
   );
@@ -61,7 +61,7 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <SheetHeader>
-                <SheetTitle>LifePath AI</SheetTitle>
+                <SheetTitle>PivotPoint</SheetTitle>
               </SheetHeader>
               <nav aria-label="Mobile" className="mt-4 flex flex-col gap-1 px-4">
                 {NAV_ITEMS.map((item) => (
