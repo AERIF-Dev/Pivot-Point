@@ -14,7 +14,7 @@
 import { handleAnalyze } from "../src/server/analyze";
 
 interface Env {
-  GEMINI_API_KEY?: string;
+  GEMINI_API_KEY?: string | undefined;
   ALLOWED_ORIGIN?: string;
 }
 

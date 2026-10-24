@@ -385,7 +385,8 @@ export function applyChanges(
 ): LifePathData {
   let next: LifePathData = { ...data };
   for (const def of defs) {
-    if (def.id in applied) next = def.apply(next, applied[def.id]);
+    const v = applied[def.id];
+    if (v !== undefined) next = def.apply(next, v);
   }
   return next;
 }

@@ -39,7 +39,7 @@ export async function analyze<Op extends AiOperationName>(
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({ operation, input }),
-      signal,
+      signal: signal ?? null,
     });
   } catch {
     throw new AiRequestError("network", "Could not reach LifePath's AI service. Check your connection.");

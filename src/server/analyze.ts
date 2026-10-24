@@ -14,7 +14,7 @@ import {
 import { buildPrompt } from "./prompts";
 
 export interface AnalyzeEnv {
-  GEMINI_API_KEY?: string;
+  GEMINI_API_KEY?: string | undefined;
 }
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -45,7 +45,7 @@ export function extractJsonObject(raw: string): unknown {
 type GemmaResult =
   | { kind: "ok"; text: string }
   | { kind: "refused"; reason: string }
-  | { kind: "http"; status: number; message: string; retryAfterMs?: number }
+  | { kind: "http"; status: number; message: string; retryAfterMs?: number | undefined }
   | { kind: "timeout" };
 
 async function callGemma(apiKey: string, prompt: string): Promise<GemmaResult> {

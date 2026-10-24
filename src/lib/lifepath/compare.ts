@@ -49,7 +49,7 @@ function costIncreaseLabel(data: LifePathData): string {
   if (data.offer.otherJobCostsMonthly > data.currentJob.otherJobCostsMonthly)
     parts.push("other job-related");
   if (parts.length === 0) return "job-related";
-  if (parts.length === 1) return parts[0];
+  if (parts.length === 1) return parts[0] ?? "job-related";
   return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
 }
 

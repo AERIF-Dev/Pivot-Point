@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 interface BaseProps {
   label: string;
   hint?: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }
 
 export function FieldShell({
@@ -172,7 +172,7 @@ export function DayPicker({
   label: string;
   value: Weekday[];
   onChange: (v: Weekday[]) => void;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <fieldset className={cn("space-y-1.5", className)}>

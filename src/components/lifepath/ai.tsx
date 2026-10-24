@@ -70,15 +70,15 @@ export function AiAction({
   variant = "default",
 }: {
   label: string;
-  runningLabel?: string;
+  runningLabel?: string | undefined;
   onRun: () => void;
   loading: boolean;
   error: AiRequestError | null;
   configured: boolean | undefined;
-  onFixture?: () => void;
-  disabled?: boolean;
+  onFixture?: (() => void) | undefined;
+  disabled?: boolean | undefined;
   privacyNote?: ReactNode;
-  variant?: "default" | "soft" | "outline";
+  variant?: "default" | "soft" | "outline" | undefined;
 }) {
   const notConfigured = configured === false || error?.code === "not_configured";
   return (

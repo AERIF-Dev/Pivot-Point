@@ -40,7 +40,7 @@ export function JourneyBar() {
                 onClick={() => j.go(i)}
                 className={cn(
                   "h-1.5 rounded-full transition-all",
-                  i === j.step ? "w-6 bg-primary" : i < j.step ? "w-3 bg-success" : "w-3 bg-navy-border",
+                  i === j.step ? "w-6 bg-primary" : i < (j.step ?? 0) ? "w-3 bg-success" : "w-3 bg-navy-border",
                 )}
               />
             ))}

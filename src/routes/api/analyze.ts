@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 // which the Cloudflare Worker adapter (worker/index.ts) also uses.
 async function handle(request: Request) {
   const { handleAnalyze } = await import("@/server/analyze");
-  return handleAnalyze(request, { GEMINI_API_KEY: process.env.GEMINI_API_KEY });
+  return handleAnalyze(request, { GEMINI_API_KEY: process.env["GEMINI_API_KEY"] });
 }
 
 export const Route = createFileRoute("/api/analyze")({

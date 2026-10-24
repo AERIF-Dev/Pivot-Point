@@ -106,7 +106,7 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
   const value = useMemo<JourneyState>(
     () => ({
       step,
-      current: step == null ? null : JOURNEY_STEPS[step],
+      current: step == null ? null : (JOURNEY_STEPS[step] ?? null),
       start,
       go,
       next: () => (step == null ? undefined : step < JOURNEY_STEPS.length - 1 ? go(step + 1) : setStep(null)),

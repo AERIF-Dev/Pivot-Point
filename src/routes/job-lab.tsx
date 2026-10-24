@@ -131,7 +131,7 @@ function JobLabPage() {
                 max={Math.max(sliderMax, sliderMin + 1)}
                 step={0.25}
                 value={[sliderWage]}
-                onValueChange={([v]) => setWhatIf(v)}
+                onValueChange={([v]) => setWhatIf(v ?? null)}
                 disabled={c.financialVerdict === "insufficient"}
               />
               <div className="mt-2 flex justify-between text-xs text-muted-foreground tabular">

@@ -355,7 +355,7 @@ function ChangeCard({
           max={Math.max(p.max, p.min + p.step)}
           step={p.step}
           value={[value]}
-          onValueChange={([v]) => onValue(v)}
+          onValueChange={([v]) => onValue(v ?? value)}
         />
       </div>
 
