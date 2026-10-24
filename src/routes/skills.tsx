@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle, BadgeCheck, Compass, GraduationCap, Info, Layers, Lightbulb, ShieldAlert } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { AiAction, AiResultMeta } from "@/components/lifepath/ai";
 import { NextStage, PageBody, PageHeader, Panel } from "@/components/lifepath/blocks";
@@ -186,9 +186,12 @@ function SkillCard({ skill }: { skill: ExtractedSkill }) {
 
 function SkillMap({ skills }: { skills: ExtractedSkill[] }) {
   const careers = Array.from(new Set(skills.flatMap((s) => s.relatedCareers))).slice(0, 10);
-  const chart = careers
-    .map((c) => ({ name: c, skills: skills.filter((s) => s.relatedCareers.includes(c)).length }))
-    .sort((a, b) => b.skills - a.skills);
+  const chart = skills.map((s) => ({
+    name: s.name,
+    "Career paths": s.relatedCareers.length,
+    "Strengths you have": s.existingStrengths.length,
+    "Items to verify": s.possibleGaps.length,
+  }));
   if (careers.length === 0) return null;
   return (
     <div className="grid gap-6 rounded-xl border border-border bg-background p-5 lg:grid-cols-2">
@@ -230,7 +233,7 @@ function SkillMap({ skills }: { skills: ExtractedSkill[] }) {
         </div>
       </div>
       <div>
-        <div className="mb-3 text-sm font-semibold text-foreground">Career paths supported by the most skills</div>
+        <div className="mb-3 text-sm font-semibold text-foreground">What each skill brings</div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chart} layout="vertical" margin={{ left: 8, right: 16 }}>
@@ -238,7 +241,10 @@ function SkillMap({ skills }: { skills: ExtractedSkill[] }) {
               <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
               <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 11, fill: "var(--foreground)" }} />
               <Tooltip cursor={{ fill: "var(--muted)" }} contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }} />
-              <Bar dataKey="skills" name="Matching skills" fill="var(--chart-2)" radius={[0, 6, 6, 0]} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="Career paths" stackId="a" fill="var(--chart-1)" />
+              <Bar dataKey="Strengths you have" stackId="a" fill="var(--chart-2)" />
+              <Bar dataKey="Items to verify" stackId="a" fill="var(--chart-3)" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

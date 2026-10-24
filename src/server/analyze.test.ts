@@ -49,21 +49,20 @@ describe("AI proxy", () => {
   });
 
   it("calls gemma-4-26b-a4b-it, ignores thought parts, and validates the JSON", async () => {
-    const fetchMock = vi.fn(async () =>
-      Response.json({
+    const chunks = [
+      { candidates: [{ content: { parts: [{ text: "thinking…", thought: true }] } }] },
+      { candidates: [{ content: { parts: [{ text: '```json\n{"summary":"ok","skills":[{"name":"Inspection",' }] } }] },
+      {
         candidates: [
           {
             finishReason: "STOP",
-            content: {
-              parts: [
-                { text: "thinking…", thought: true },
-                { text: '```json\n{"summary":"ok","skills":[{"name":"Inspection","evidence":"Inspect parts","relatedCareers":["QA"],"existingStrengths":[],"possibleGaps":[],"nextStep":"Take a course"}]}\n```' },
-              ],
-            },
+            content: { parts: [{ text: '"evidence":"Inspect parts","relatedCareers":["QA"],"existingStrengths":[],"possibleGaps":[],"nextStep":"Take a course"}]}\n```' }] },
           },
         ],
-      }),
-    );
+      },
+    ];
+    const sse = chunks.map((c) => `data: ${JSON.stringify(c)}\r\n\r\n`).join("");
+    const fetchMock = vi.fn(async () => new Response(sse, { headers: { "content-type": "text/event-stream" } }));
     vi.stubGlobal("fetch", fetchMock);
     const res = await handleAnalyze(post({ operation: "extract_skills", input: { profile } }), { GEMINI_API_KEY: "k" });
     const body = await res.json();
@@ -71,7 +70,7 @@ describe("AI proxy", () => {
     expect(body.source).toBe("gemma");
     expect(body.data.skills[0].name).toBe("Inspection");
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toContain("/models/gemma-4-26b-a4b-it:generateContent");
+    expect(url).toContain("/models/gemma-4-26b-a4b-it:streamGenerateContent");
     expect(new Headers(init.headers).get("x-goog-api-key")).toBe("k");
   });
 

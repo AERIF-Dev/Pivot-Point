@@ -19,7 +19,9 @@ export interface AnalyzeEnv {
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MAX_BODY_CHARS = 32_000;
-const REQUEST_TIMEOUT_MS = 55_000;
+const FIRST_BYTE_TIMEOUT_MS = 75_000;
+const IDLE_TIMEOUT_MS = 30_000;
+const OVERALL_TIMEOUT_MS = 120_000;
 const MAX_ATTEMPTS = 2;
 
 const json = (body: unknown, status = 200) =>
@@ -48,63 +50,111 @@ type GemmaResult =
   | { kind: "http"; status: number; message: string; retryAfterMs?: number | undefined }
   | { kind: "timeout" };
 
+type Part = { text?: string; thought?: boolean };
+type GemmaChunk = {
+  promptFeedback?: { blockReason?: string };
+  candidates?: { finishReason?: string; content?: { parts?: Part[] } }[];
+};
+
+/**
+ * Calls Gemma 4 with streaming (SSE) so long queue times don't hit a fixed
+ * total timeout: we wait up to FIRST_BYTE_TIMEOUT_MS for the first chunk and
+ * IDLE_TIMEOUT_MS between chunks, with an overall cap.
+ */
 async function callGemma(apiKey: string, prompt: string): Promise<GemmaResult> {
-  let res: Response;
+  const controller = new AbortController();
+  const overall = setTimeout(() => controller.abort(), OVERALL_TIMEOUT_MS);
+  let idle: ReturnType<typeof setTimeout> | undefined;
+  const arm = (ms: number) => {
+    if (idle) clearTimeout(idle);
+    idle = setTimeout(() => controller.abort(), ms);
+  };
+
   try {
-    res = await fetch(`${GEMINI_BASE}/${GEMMA_MODEL}:generateContent`, {
+    arm(FIRST_BYTE_TIMEOUT_MS);
+    const res = await fetch(`${GEMINI_BASE}/${GEMMA_MODEL}:streamGenerateContent?alt=sse`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 8192 },
+        // Gemma 4 thinking: "minimal" = off, "high" = on. Off keeps answers fast for interactive use.
+        generationConfig: { temperature: 0.4, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: "minimal" } },
       }),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: controller.signal,
     });
+
+    if (!res.ok) {
+      let message = `Gemini API returned ${res.status}.`;
+      try {
+        const body = (await res.json()) as { error?: { message?: string } } | { error?: { message?: string } }[];
+        const err = Array.isArray(body) ? body[0]?.error : body?.error;
+        if (err?.message) message = err.message.slice(0, 300);
+      } catch {
+        /* ignore */
+      }
+      const ra = Number(res.headers.get("retry-after"));
+      return {
+        kind: "http",
+        status: res.status,
+        message,
+        retryAfterMs: Number.isFinite(ra) && ra > 0 ? Math.min(ra * 1000, 5000) : undefined,
+      };
+    }
+    if (!res.body) return { kind: "http", status: 502, message: "Empty response from the Gemini API." };
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let text = "";
+    let finishReason: string | undefined;
+    let blockReason: string | undefined;
+
+    const handleEvent = (event: string) => {
+      for (const line of event.split("\n")) {
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (!payload) continue;
+        try {
+          const chunk = JSON.parse(payload) as GemmaChunk;
+          if (chunk.promptFeedback?.blockReason) blockReason = chunk.promptFeedback.blockReason;
+          const cand = chunk.candidates?.[0];
+          if (cand?.finishReason) finishReason = cand.finishReason;
+          for (const p of cand?.content?.parts ?? []) if (!p.thought) text += p.text ?? "";
+        } catch {
+          /* ignore malformed keep-alive lines */
+        }
+      }
+    };
+
+    arm(IDLE_TIMEOUT_MS);
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      arm(IDLE_TIMEOUT_MS);
+      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
+      let sep: number;
+      while ((sep = buffer.indexOf("\n\n")) !== -1) {
+        handleEvent(buffer.slice(0, sep));
+        buffer = buffer.slice(sep + 2);
+      }
+    }
+    if (buffer.trim()) handleEvent(buffer);
+
+    if (blockReason) return { kind: "refused", reason: blockReason };
+    text = text.trim();
+    if (!text && finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
+      return { kind: "refused", reason: finishReason };
+    }
+    return { kind: "ok", text };
   } catch (err) {
-    if (err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError")) {
+    if (controller.signal.aborted || (err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError"))) {
       return { kind: "timeout" };
     }
     return { kind: "http", status: 502, message: "Could not reach the Gemini API." };
+  } finally {
+    clearTimeout(overall);
+    if (idle) clearTimeout(idle);
   }
-
-  if (!res.ok) {
-    let message = `Gemini API returned ${res.status}.`;
-    try {
-      const body = (await res.json()) as { error?: { message?: string } };
-      if (body?.error?.message) message = body.error.message.slice(0, 300);
-    } catch {
-      /* ignore */
-    }
-    const ra = Number(res.headers.get("retry-after"));
-    return {
-      kind: "http",
-      status: res.status,
-      message,
-      retryAfterMs: Number.isFinite(ra) && ra > 0 ? Math.min(ra * 1000, 5000) : undefined,
-    };
-  }
-
-  type Part = { text?: string; thought?: boolean };
-  const body = (await res.json()) as {
-    promptFeedback?: { blockReason?: string };
-    candidates?: { finishReason?: string; content?: { parts?: Part[] } }[];
-  };
-  if (body.promptFeedback?.blockReason) {
-    return { kind: "refused", reason: body.promptFeedback.blockReason };
-  }
-  const cand = body.candidates?.[0];
-  const text = (cand?.content?.parts ?? [])
-    .filter((p) => !p.thought)
-    .map((p) => p.text ?? "")
-    .join("")
-    .trim();
-  if (!text) {
-    if (cand?.finishReason && cand.finishReason !== "STOP") {
-      return { kind: "refused", reason: cand.finishReason };
-    }
-    return { kind: "ok", text: "" };
-  }
-  return { kind: "ok", text };
 }
 
 async function runOperation(apiKey: string, req: AnalyzeRequest): Promise<Response> {
