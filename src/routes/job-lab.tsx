@@ -222,7 +222,11 @@ function JobLabPage() {
                 label={`Wage for +${money(c.targetImprovementMonthly)}/mo`}
                 value={c.targetWage == null ? "—" : `${wage(c.targetWage)}/hr`}
                 tone="positive"
-                sub={c.targetWage != null ? `${signedMoney((c.targetWage - sliderWage) * 1)}/hr vs. ${whatIf != null ? "what-if" : "offer"}`.replace("$", "$") : undefined}
+                sub={
+                  c.targetWage != null
+                    ? `${c.targetWage >= sliderWage ? "+" : "−"}${wage(Math.abs(c.targetWage - sliderWage))}/hr vs. ${whatIf != null ? "what-if wage" : "offer"}`
+                    : undefined
+                }
               />
             </div>
             <SensitivityChart data={effective} c={c} currentWage={sliderWage} />
