@@ -38,7 +38,8 @@ export interface Comparison {
 }
 
 export function hasEnoughOfferInfo(data: LifePathData): boolean {
-  return data.offer.hourlyWage > 0 && data.offer.hoursPerWeek > 0;
+  return Number.isFinite(data.offer.hourlyWage) && data.offer.hourlyWage > 0 &&
+    Number.isFinite(data.offer.hoursPerWeek) && data.offer.hoursPerWeek > 0;
 }
 
 function costIncreaseLabel(data: LifePathData): string {
@@ -60,23 +61,26 @@ export function explainComparison(data: LifePathData, c: Omit<Comparison, "expla
   const sp = c.deltas.spendableMonthly;
   const cost = c.deltas.jobCostsMonthly;
   const rem = c.deltas.remainingMonthly;
+  const incomeLabel = c.offer.benefitsMonthlyChange !== c.current.benefitsMonthlyChange
+    ? "spendable income (estimated take-home plus benefit changes)"
+    : "take-home pay";
   let sentence: string;
   if (sp > 0 && cost > 0) {
-    sentence = `This offer increases your estimated monthly take-home pay by ${money(sp)}, but additional ${costIncreaseLabel(data)} expenses (${money(cost)}) ${
+    sentence = `This offer increases your estimated monthly ${incomeLabel} by ${money(sp)}, but additional ${costIncreaseLabel(data)} expenses (${money(cost)}) ${
       rem >= 0
         ? `reduce the improvement to ${money(rem)}.`
         : `turn it into an estimated shortfall of ${money(-rem)} a month.`
     }`;
   } else if (sp > 0) {
-    sentence = `This offer increases your estimated monthly take-home pay by ${money(sp)}${
+    sentence = `This offer increases your estimated monthly ${incomeLabel} by ${money(sp)}${
       cost < 0 ? ` and lowers job-related costs by ${money(-cost)}` : ""
     }, for an estimated improvement of ${money(rem)} a month.`;
   } else if (sp < 0) {
-    sentence = `This offer lowers your estimated monthly take-home pay by ${money(-sp)}${
+    sentence = `This offer lowers your estimated monthly ${incomeLabel} by ${money(-sp)}${
       cost < 0 ? `, partly offset by ${money(-cost)} lower job-related costs` : ""
     }, so remaining funds change by ${rem >= 0 ? "+" : "−"}${money(Math.abs(rem))} a month.`;
   } else {
-    sentence = `Take-home pay stays about the same; remaining funds change by ${rem >= 0 ? "+" : "−"}${money(Math.abs(rem))} a month because of job-related costs.`;
+    sentence = `Estimated ${incomeLabel} stays about the same; remaining funds change by ${rem >= 0 ? "+" : "−"}${money(Math.abs(rem))} a month because of job-related costs.`;
   }
   const commute = c.deltas.weeklyCommuteHours;
   if (Math.abs(commute) >= 0.25) {
@@ -85,6 +89,9 @@ export function explainComparison(data: LifePathData, c: Omit<Comparison, "expla
   const hard = hardConflicts(c.offerConflicts);
   if (hard.length > 0) {
     sentence += ` There ${hard.length === 1 ? "is 1 schedule conflict" : `are ${hard.length} schedule conflicts`} to resolve first.`;
+  }
+  if (c.offerConflicts.some((x) => x.kind === "missing-times")) {
+    sentence += " Schedule feasibility is unknown until missing schedule details are entered.";
   }
   return sentence;
 }

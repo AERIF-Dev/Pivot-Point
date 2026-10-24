@@ -97,10 +97,11 @@ function JobLabPage() {
                   </p>
                 </div>
               </div>
-              <div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[420px]">
-                <MiniStat label="Gross pay" value={signedMoney(c.deltas.grossMonthly)} tone={toneFor(c.deltas.grossMonthly)} />
+              <div className="grid shrink-0 grid-cols-2 gap-3 lg:w-[420px]">
+                <MiniStat label="Gross / mo" value={signedMoney(c.deltas.grossMonthly)} tone={toneFor(c.deltas.grossMonthly)} />
+                <MiniStat label="Take-home / mo" value={signedMoney(c.deltas.takeHomeMonthly)} tone={toneFor(c.deltas.takeHomeMonthly)} />
+                <MiniStat label="Added costs / mo" value={signedMoney(c.deltas.jobCostsMonthly)} tone={toneFor(-c.deltas.jobCostsMonthly)} />
                 <MiniStat label="Remaining / mo" value={signedMoney(c.deltas.remainingMonthly)} tone={toneFor(c.deltas.remainingMonthly, 9)} />
-                <MiniStat label="Commute / wk" value={signedHours(c.deltas.weeklyCommuteHours)} tone={toneFor(-c.deltas.weeklyCommuteHours, 0.1)} />
               </div>
             </div>
 
@@ -151,7 +152,7 @@ function JobLabPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={[
-                      { name: "Take-home", Current: Math.round(c.current.totalSpendableMonthly), Offer: Math.round(c.offer.totalSpendableMonthly) },
+                      { name: "Spendable income", Current: Math.round(c.current.totalSpendableMonthly), Offer: Math.round(c.offer.totalSpendableMonthly) },
                       { name: "Job costs", Current: Math.round(c.current.jobCostsMonthly), Offer: Math.round(c.offer.jobCostsMonthly) },
                       { name: "Remaining", Current: Math.round(c.current.remainingMonthly), Offer: Math.round(c.offer.remainingMonthly) },
                     ]}
@@ -174,7 +175,7 @@ function JobLabPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <Panel title="The offer" description="Every value is an editable assumption." icon={<Briefcase className="h-4 w-4" />}>
-            <JobForm job={data.offer} onChange={(p) => patch("offer", p)} showBenefits />
+            <JobForm job={data.offer} onChange={(p) => { patch("offer", p); if (p.hourlyWage !== undefined) setWhatIf(null); }} showBenefits />
           </Panel>
           <Panel title="Your current job" description="Costs here disappear if you switch." icon={<Briefcase className="h-4 w-4" />}>
             <JobForm job={data.currentJob} onChange={(p) => patch("currentJob", p)} />
@@ -300,7 +301,7 @@ function ComparisonTable({ data, c }: { data: LifePathData; c: Comparison }) {
   rows.push({ label: "Paid hours / week", cur: `${data.currentJob.hoursPerWeek}`, off: `${data.offer.hoursPerWeek}`, diff: signedHours(c.deltas.weeklyPaidHours, 0), tone: null });
   rows.push({ label: "Gross pay", cur: money(c.current.grossMonthly), off: money(c.offer.grossMonthly), diff: signedMoney(c.deltas.grossMonthly), tone: d(c.deltas.grossMonthly) });
   rows.push({ label: `Est. take-home (${data.finances.takeHomePercent}%)`, cur: money(c.current.takeHomeMonthly), off: money(c.offer.takeHomeMonthly), diff: signedMoney(c.deltas.takeHomeMonthly), tone: d(c.deltas.takeHomeMonthly) });
-  if (c.current.otherIncomeMonthly || c.offer.benefitsMonthlyChange) {
+  if (c.current.otherIncomeMonthly || c.current.benefitsMonthlyChange || c.offer.benefitsMonthlyChange) {
     rows.push({ label: "Other income + benefit change", cur: money(c.current.otherIncomeMonthly + c.current.benefitsMonthlyChange), off: money(c.offer.otherIncomeMonthly + c.offer.benefitsMonthlyChange), diff: signedMoney(c.offer.benefitsMonthlyChange - c.current.benefitsMonthlyChange), tone: d(c.offer.benefitsMonthlyChange - c.current.benefitsMonthlyChange) });
   }
   rows.push({ label: "Childcare", cur: money(data.currentJob.childcareMonthly), off: money(data.offer.childcareMonthly), diff: signedMoney(data.offer.childcareMonthly - data.currentJob.childcareMonthly), tone: d(data.offer.childcareMonthly - data.currentJob.childcareMonthly, false) });
@@ -336,7 +337,7 @@ function ComparisonTable({ data, c }: { data: LifePathData; c: Comparison }) {
         </tbody>
       </table>
       <div className="mt-3">
-        <Assumption>Take-home is an adjustable estimate, not a tax calculation. Earnings use each job's own paid hours.</Assumption>
+        <Assumption>Uses 52/12 weeks per month and the entered take-home percentage, not a tax calculation. Each job uses its own paid hours and total monthly job costs; only the difference is subtracted from the raise. Empty cost fields count as $0, so confirm all costs before relying on the estimate.</Assumption>
       </div>
     </div>
   );

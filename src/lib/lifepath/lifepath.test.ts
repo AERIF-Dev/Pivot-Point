@@ -70,9 +70,46 @@ describe("sample job comparison", () => {
   it("wageForRemaining returns null when there are no paid hours", () => {
     expect(wageForRemaining({ ...d.offer, hoursPerWeek: 0 }, d.finances, 0)).toBeNull();
   });
+
+  it("keeps benefit changes distinct from take-home wages", () => {
+    const changed = { ...d, offer: { ...d.offer, benefitsMonthlyChange: 200 } };
+    const result = compareJobs(changed);
+    expect(result.deltas.takeHomeMonthly).toBeCloseTo(676, 5);
+    expect(result.deltas.spendableMonthly).toBeCloseTo(876, 5);
+    expect(result.deltas.remainingMonthly).toBeCloseTo(246, 5);
+    expect(result.explanation).toContain("spendable income");
+    expect(compareJobs({ ...changed, offer: { ...changed.offer, hourlyWage: result.breakEvenWage! } }).deltas.remainingMonthly).toBeCloseTo(0, 6);
+  });
+
+  it("applies changed childcare and commute costs exactly once", () => {
+    const changed = { ...d, offer: { ...d.offer, childcareMonthly: 950, transportationMonthly: 380 } };
+    const result = compareJobs(changed);
+    expect(result.deltas.remainingMonthly).toBeCloseTo(c.deltas.remainingMonthly - 150, 5);
+    expect(compareJobs({ ...changed, offer: { ...changed.offer, hourlyWage: result.breakEvenWage! } }).deltas.remainingMonthly).toBeCloseTo(0, 6);
+  });
+
+  it("rejects nonfinite pay instead of presenting a valid comparison", () => {
+    expect(compareJobs({ ...d, offer: { ...d.offer, hourlyWage: Infinity } }).verdict).toBe("insufficient");
+  });
 });
 
 describe("schedule conflicts", () => {
+  it("detects next-day commitments after an overnight Sunday shift", () => {
+    const d = createSampleData();
+    const job = { ...d.offer, workDays: ["Sun" as const], shiftStart: "22:00", shiftEnd: "06:00" };
+    const schedule = { ...d.schedule, needsChildcare: false,
+      commitments: [{ id: "m", label: "Monday class", days: ["Mon" as const], start: "05:00", end: "07:00" }] };
+    expect(detectConflicts(job, schedule).some((c) => c.kind === "commitment")).toBe(true);
+    expect(detectConflicts({ ...job, workDays: ["Fri"] }, schedule).some((c) => c.kind === "commitment")).toBe(false);
+  });
+  it("reports unknown feasibility when childcare hours or work days are missing", () => {
+    const d = createSampleData();
+    d.offer.workDays = [];
+    d.schedule.childcareOpen = "";
+    const result = compareJobs(d);
+    expect(result.offerConflicts.filter((c) => c.kind === "missing-times")).toHaveLength(2);
+    expect(result.explanation).toContain("Schedule feasibility is unknown");
+  });
   it("detects a pick-up conflict when the shift ends too late", () => {
     const d = createSampleData();
     const late = { ...d.offer, shiftStart: "10:00", shiftEnd: "18:00" };
@@ -100,6 +137,7 @@ describe("One Change Away", () => {
     expect(e.impact.remainingDelta).toBeCloseTo(2 * 40 * WEEKS_PER_MONTH * 0.78, 4);
     expect(e.impact.conflictsResolved).toBe(0);
     expect(e.outcome.verdict).toBe("schedule-conflict");
+    expect(e.outcome.targetShortfallMonthly).toBe(0);
   });
 
   it("an 8 AM start resolves the childcare conflict", () => {
@@ -108,6 +146,20 @@ describe("One Change Away", () => {
     const e = evaluateChange(d, def, def.param.defaultValue, base);
     expect(e.impact.conflictsResolved).toBe(1);
     expect(e.outcome.verdict).toBe("better");
+    expect(e.outcome.targetShortfallMonthly).toBeCloseTo(254, 5);
+  });
+
+  it("reports both a resolved drop-off barrier and a new pick-up barrier", () => {
+    const result = evaluateChange(d, byId("later-shift"), 11 * 60, base);
+    expect(result.impact.conflictsResolved).toBe(1);
+    expect(result.impact.conflictsAdded).toBe(1);
+    expect(result.outcome.verdict).toBe("schedule-conflict");
+  });
+
+  it("does not invent transportation savings from a shorter commute", () => {
+    const result = evaluateChange(d, byId("closer-workplace"), 40, base);
+    expect(result.impact.weeklyHoursDelta).toBeCloseTo(-5, 5);
+    expect(result.impact.remainingDelta).toBe(0);
   });
 
   it("childcare opening by 5:00 AM resolves the conflict", () => {

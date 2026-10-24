@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AiRequestError, analyze, fetchAiStatus } from "@/lib/ai/client";
 import type { AiOperationName, InputOf, OutputOf } from "@/lib/ai/contract";
@@ -26,6 +26,7 @@ export function useAiOperation<Op extends AiOperationName>(op: Op) {
   const [state, setState] = useState<AiRunState>({ loading: false, error: null });
   const controller = useRef<AbortController | null>(null);
   const status = useAiStatus();
+  useEffect(() => () => controller.current?.abort(), []);
 
   const run = useCallback(
     async (input: InputOf<Op>) => {
@@ -35,6 +36,7 @@ export function useAiOperation<Op extends AiOperationName>(op: Op) {
       setState({ loading: true, error: null });
       try {
         const res = await analyze(op, input, c.signal);
+        if (c.signal.aborted) return;
         setAiResult(op, {
           source: "gemma",
           model: res.model,
@@ -58,6 +60,7 @@ export function useAiOperation<Op extends AiOperationName>(op: Op) {
 
   const useFixture = useCallback(
     (fixture: OutputOf<Op>) => {
+      controller.current?.abort();
       setAiResult(op, {
         source: "fixture",
         model: "none",

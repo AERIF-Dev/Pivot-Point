@@ -63,6 +63,7 @@ export function SiteFooter() {
           <p className="font-medium text-navy-foreground">Built for Hack for Humanity Detroit 2026</p>
           <p>AI powered by Gemma 4</p>
           <p>Open-source civic technology prototype</p>
+          <a href="https://github.com/AERIF-Dev/Pivot-Point" target="_blank" rel="noopener noreferrer" className="block text-navy-foreground underline-offset-4 hover:underline">View source on GitHub</a>
           <Link to="/about" className="inline-block pt-2 text-navy-foreground underline-offset-4 hover:underline">
             How it works & privacy
           </Link>
@@ -70,7 +71,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <p className="text-xs leading-relaxed text-navy-muted">
             Educational decision support only — not professional financial, legal, or employment advice. Your data stays in
-            this browser.
+            this browser; selected details are sent for AI analysis only when you ask.
           </p>
           <ClearDataButton />
         </div>

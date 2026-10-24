@@ -60,7 +60,7 @@ Without the key, every calculator works and AI panels show **"AI connection requ
 
 ```sh
 npm install
-cp .env.example .env    # add GEMINI_API_KEY (the .env file is git-ignored via *.local / your own rules)
+cp .env.example .env    # add GEMINI_API_KEY; .env and .env.* are git-ignored except .env.example
 npm run dev
 npm test                # deterministic finance, schedule, and scenario tests
 npm run build
@@ -68,7 +68,7 @@ npm run build
 
 ## Testing the sample journey
 
-1. Open `/` and click **Try the Live Demo** (or **Try Sample Journey** in the header).
+1. Open `/` and click **Try Sample Journey** (also available in the header).
 2. Step through: profile → skills (press **Find my transferable skills**) → Job Lab comparison → hidden costs and the
    6 AM childcare conflict → break-even wage (≈ $24.66/hr, drag the wage slider) → One Change Away (press **Try this
    change** on "Ask to start at 8:00 AM").

@@ -70,7 +70,7 @@ export function Panel({
   id?: string;
 }) {
   return (
-    <section id={id} className={cn("surface scroll-mt-24 p-5 sm:p-6", className)}>
+    <section id={id} className={cn("surface min-w-0 scroll-mt-24 p-5 sm:p-6", className)}>
       {title || actions ? (
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-3">

@@ -22,6 +22,7 @@ import {
 import { VERDICT_LABELS } from "@/lib/lifepath/compare";
 import { hours, money, signedHours, signedMoney, wage } from "@/lib/lifepath/format";
 import { formatClock } from "@/lib/lifepath/time";
+import { hardConflicts } from "@/lib/lifepath/schedule";
 import { useLifePath } from "@/state/lifepath-store";
 import { useAiOperation } from "@/state/use-ai";
 import { cn } from "@/lib/utils";
@@ -321,17 +322,18 @@ function ChangeCard({
   onValue: (value: number) => void;
 }) {
   const { def, value, impact } = e;
+  const remainingConflicts = e.outcome.target === "offer" ? e.outcome.comparison.offerConflicts : e.outcome.comparison.currentConflicts;
   const p = def.param;
   return (
     <article
       className={cn(
         "animate-rise flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-card transition-shadow",
-        applied ? "border-success ring-2 ring-success/25" : "border-border",
+        applied ? "border-success ring-2 ring-success/25" : rank === 1 ? "border-primary ring-2 ring-primary/20" : "border-border",
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
-          {rank ? <Badge variant="info">#{rank}</Badge> : null}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {rank ? <Badge variant="info">{rank === 1 ? "Start here" : `#${rank}`}</Badge> : null}
           {impact.conflictsResolved > 0 ? <Badge variant="success"><Unlock aria-hidden /> Resolves conflict</Badge> : null}
         </div>
         <Badge variant="secondary"><FlaskConical aria-hidden /> Calculated</Badge>
@@ -382,6 +384,18 @@ function ChangeCard({
       <ul className="space-y-1 text-xs text-muted-foreground">
         {def.assumptions.map((a) => <li key={a}>• {a}</li>)}
       </ul>
+
+      <div className="rounded-lg border border-border p-3 text-sm">
+        <div className="font-semibold">Still to resolve</div>
+        {hardConflicts(remainingConflicts).length > 0 ? (
+          <ul className="mt-1 space-y-1 text-destructive">
+            {hardConflicts(remainingConflicts).map((c, i) => <li key={i}>• {c.title}</li>)}
+          </ul>
+        ) : <p className="mt-1">No known hard conflicts in the entered schedule. Availability still needs confirmation.</p>}
+        {remainingConflicts.filter((c) => c.severity === "caution").map((c, i) => <p key={i} className="mt-1 text-warning-strong">{c.title}: {c.detail}</p>)}
+        {e.outcome.targetShortfallMonthly != null && e.outcome.targetShortfallMonthly > 0 ? <p className="mt-1 text-warning-strong">Still {money(e.outcome.targetShortfallMonthly)}/mo short of your improvement goal.</p> : null}
+        <p className="mt-1 text-muted-foreground">A calculated improvement is not a confirmed feasible job. Verify the change, costs, and care arrangements first.</p>
+      </div>
 
       <p className="border-t border-border pt-3 text-sm"><span className="font-semibold">Next action:</span> {def.nextAction}</p>
 

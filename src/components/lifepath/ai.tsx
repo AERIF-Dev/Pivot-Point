@@ -86,7 +86,7 @@ export function AiAction({
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={onRun} disabled={loading || disabled || notConfigured} variant={variant}>
           {loading ? <Loader2 className="animate-spin" aria-hidden /> : <Bot aria-hidden />}
-          {loading ? runningLabel : label}
+          {loading ? runningLabel : error && !notConfigured ? "Retry with Gemma 4" : label}
         </Button>
         {onFixture && (notConfigured || error) ? (
           <Button variant="outline" onClick={onFixture}>
@@ -94,6 +94,7 @@ export function AiAction({
           </Button>
         ) : null}
       </div>
+      {loading ? <p role="status" aria-live="polite" className="text-sm text-muted-foreground">Gemma 4 is working on your request. This can take a minute or two; the calculators remain available.</p> : null}
       {privacyNote ? <p className="text-xs text-muted-foreground">{privacyNote}</p> : null}
       {notConfigured ? (
         <div className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning-soft p-3 text-sm text-warning-foreground">

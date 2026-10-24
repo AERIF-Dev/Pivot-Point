@@ -1,6 +1,7 @@
 // Deterministic schedule-conflict detection.
 import { summarizeJob } from "./finance";
 import type { HouseholdFinances, JobTerms, ScheduleConstraints } from "./types";
+import { WEEKDAYS } from "./types";
 import {
   MINUTES_PER_DAY,
   formatClock,
@@ -84,6 +85,15 @@ export function detectConflicts(
   const conflicts: ScheduleConflict[] = [];
   const plan = planDay(job, schedule);
 
+  if (job.workDays.length === 0) {
+    conflicts.push({ kind: "missing-times", severity: "caution", title: "Work days missing",
+      detail: "Choose work days to check commitments and calculate weekly commute time. Schedule feasibility is unknown." });
+  }
+  if (schedule.needsChildcare && (plan.childcareOpen == null || plan.childcareClose == null)) {
+    conflicts.push({ kind: "missing-times", severity: "caution", title: "Childcare hours missing",
+      detail: "Enter childcare opening and closing times. Schedule feasibility is unknown until both are provided." });
+  }
+
   if (plan.shiftStart == null || plan.shiftEnd == null) {
     conflicts.push({
       kind: "missing-times",
@@ -133,17 +143,26 @@ export function detectConflicts(
     for (const c of schedule.commitments) {
       const cs = parseTime(c.start);
       const ce = parseTime(c.end);
-      if (cs == null || ce == null || ce <= cs) continue;
-      const sharedDays = c.days.filter((d) => job.workDays.includes(d));
-      if (sharedDays.length === 0) continue;
-      if (overlaps(awayStart, awayEnd, cs, ce)) {
-        conflicts.push({
-          kind: "commitment",
-          severity: "conflict",
-          title: `Overlaps “${c.label || "fixed commitment"}”`,
-          detail: `${c.label || "This commitment"} (${formatClock(cs)}–${formatClock(ce)} on ${sharedDays.join(", ")}) falls inside the time you'd be commuting or working (${formatClock(awayStart)}–${formatClock(awayEnd)}).`,
+      if (cs == null || ce == null || ce === cs) continue;
+      const sharedDays = c.days.filter((day) => {
+        const commitmentStart = WEEKDAYS.indexOf(day) * MINUTES_PER_DAY + cs;
+        const commitmentEnd = WEEKDAYS.indexOf(day) * MINUTES_PER_DAY + ce + (ce < cs ? MINUTES_PER_DAY : 0);
+        return job.workDays.some((workDay) => {
+          const offset = WEEKDAYS.indexOf(workDay) * MINUTES_PER_DAY;
+          return [-7, 0, 7].some((week) => overlaps(
+            offset + awayStart + week * MINUTES_PER_DAY,
+            offset + awayEnd + week * MINUTES_PER_DAY,
+            commitmentStart, commitmentEnd,
+          ));
         });
-      }
+      });
+      if (sharedDays.length === 0) continue;
+      conflicts.push({
+        kind: "commitment",
+        severity: "conflict",
+        title: `Overlaps “${c.label || "fixed commitment"}”`,
+        detail: `${c.label || "This commitment"} (${formatClock(cs)}–${formatClock(ce)} on ${sharedDays.join(", ")}) overlaps time you'd be commuting or working (${formatClock(awayStart)}–${formatClock(awayEnd)}).`,
+      });
     }
   }
 

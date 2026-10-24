@@ -47,6 +47,8 @@ export interface ScenarioOutcome {
   /** Weekly work + commute hours for the job being analyzed */
   weeklyHours: number;
   hardConflictCount: number;
+  /** Gap to the user's improvement goal; null when analyzing only the current job. */
+  targetShortfallMonthly: number | null;
   verdict: Verdict;
 }
 
@@ -79,6 +81,9 @@ export function scenarioOutcome(data: LifePathData): ScenarioOutcome {
     remaining: summary.remainingMonthly,
     weeklyHours: summary.weeklyWorkAndCommuteHours,
     hardConflictCount: hardConflicts(conflicts).length,
+    targetShortfallMonthly: target === "offer"
+      ? Math.max(0, comparison.targetImprovementMonthly - comparison.deltas.remainingMonthly)
+      : null,
     verdict: comparison.verdict,
   };
 }
@@ -153,7 +158,7 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       title: (v) => `Ask to start at ${formatClock(v)}`,
       obstacle: dropoff.detail,
       opportunity: (v) =>
-        `Working ${formatClock(v)}–${formatClock(v + length)} keeps the same paid hours and fits childcare that opens at ${formatClock(plan.childcareOpen)}.`,
+        `Tests ${formatClock(v)}–${formatClock(v + length)} with the same paid hours. Check remaining conflicts below: later starts can create pick-up conflicts.`,
       assumptions: [
         "The employer offers or approves a later shift — not guaranteed.",
         "Shift length and pay stay the same.",
@@ -180,9 +185,9 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       category: "childcare-hours",
       title: (v) => `Find care that opens by ${formatClock(v)}`,
       obstacle: dropoff.detail,
-      opportunity: () => `Keeps the ${formatClock(plan.shiftStart)} shift workable without changing the offer.`,
+      opportunity: () => `Tests earlier drop-off for the ${formatClock(plan.shiftStart)} shift; other schedule barriers may remain.`,
       assumptions: [
-        "Assumes a provider, relative, or before-care option exists — LifePath has not verified any.",
+        "Assumes a provider, relative, or before-care option exists — PivotPoint has not verified any.",
         "Any extra cost is not included; enter it in childcare cost if you know it.",
       ],
       nextAction:
@@ -207,7 +212,7 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       category: "childcare-hours",
       title: (v) => `Find care open until ${formatClock(v)}`,
       obstacle: pickup.detail,
-      opportunity: () => "Makes the shift end time workable for pick-up.",
+      opportunity: () => "Tests later pick-up coverage; check whether other schedule barriers remain.",
       assumptions: [
         "Assumes extended-hours care or a trusted helper is available — not verified.",
         "Any extra cost is not included.",
@@ -237,7 +242,7 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       opportunity: (v) => `Recovers ${money(from - v)}/month of the offer's improvement.`,
       assumptions: [
         "No specific program, subsidy, or provider is assumed.",
-        "Check any assistance eligibility with official sources — LifePath cannot determine it.",
+        "Check any assistance eligibility with official sources — PivotPoint cannot determine it.",
       ],
       nextAction:
         "Compare licensed providers and ask about sliding-scale fees; check official childcare assistance information via Michigan 211.",
@@ -253,7 +258,7 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
     });
   }
 
-  // 5. Closer workplace (shorter commute, proportionally lower transportation cost)
+  // 5. Closer workplace (shorter commute; costs need a separate confirmed estimate)
   if (key === "offer" && data.offer.commuteMinutesRoundTrip > data.currentJob.commuteMinutesRoundTrip) {
     const from = data.offer.commuteMinutesRoundTrip;
     const def = Math.max(10, roundTo(data.currentJob.commuteMinutesRoundTrip, 5));
@@ -261,11 +266,11 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       id: "closer-workplace",
       category: "commute",
       title: (v) => `Find a similar role ~${v} min round trip`,
-      obstacle: `The offer's ${from}-minute round trip adds ${(((from - data.currentJob.commuteMinutesRoundTrip) * c.offer.workDays) / 60).toFixed(1)} hours of commuting a week.`,
-      opportunity: () => "Saves weekly time and transportation cost while keeping the same type of role.",
+      obstacle: `The offer's ${from}-minute round trip changes weekly commuting by ${c.deltas.weeklyCommuteHours.toFixed(1)} hours compared with today.`,
+      opportunity: () => "Tests time saved by a shorter commute. Enter a confirmed transportation cost separately to estimate savings.",
       assumptions: [
-        "Assumes a similar role exists closer to home — LifePath does not list job openings.",
-        "Transportation cost scales with commute time.",
+        "Assumes a similar role exists closer to home — PivotPoint does not list job openings.",
+        "Transportation cost stays unchanged: a shorter journey does not guarantee lower fares or fixed car costs.",
         "Same pay and shift as the current offer.",
       ],
       nextAction:
@@ -281,8 +286,6 @@ export function generateChanges(data: LifePathData): ChangeDefinition[] {
       apply: (d, v) =>
         withJob(d, "offer", {
           commuteMinutesRoundTrip: v,
-          transportationMonthly:
-            from > 0 ? Math.round((d.offer.transportationMonthly * v) / from) : d.offer.transportationMonthly,
         }),
     });
   }
@@ -364,6 +367,11 @@ export function evaluateChange(
   base: ScenarioOutcome = scenarioOutcome(data),
 ): EvaluatedChange {
   const outcome = scenarioOutcome(def.apply(data, value));
+  const conflictKeys = (s: ScenarioOutcome) => new Set(hardConflicts(
+    s.target === "offer" ? s.comparison.offerConflicts : s.comparison.currentConflicts,
+  ).map((c) => `${c.kind}:${c.title}`));
+  const before = conflictKeys(base);
+  const after = conflictKeys(outcome);
   return {
     def,
     value,
@@ -371,8 +379,8 @@ export function evaluateChange(
     impact: {
       remainingDelta: outcome.remaining - base.remaining,
       weeklyHoursDelta: outcome.weeklyHours - base.weeklyHours,
-      conflictsResolved: Math.max(0, base.hardConflictCount - outcome.hardConflictCount),
-      conflictsAdded: Math.max(0, outcome.hardConflictCount - base.hardConflictCount),
+      conflictsResolved: [...before].filter((c) => !after.has(c)).length,
+      conflictsAdded: [...after].filter((c) => !before.has(c)).length,
     },
   };
 }

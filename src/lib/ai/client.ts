@@ -42,7 +42,7 @@ export async function analyze<Op extends AiOperationName>(
       signal: signal ?? null,
     });
   } catch {
-    throw new AiRequestError("network", "Could not reach LifePath's AI service. Check your connection.");
+    throw new AiRequestError("network", "Could not reach PivotPoint's AI service. Check your connection.");
   }
   let body: AnalyzeSuccess<Op> | AnalyzeFailure;
   try {

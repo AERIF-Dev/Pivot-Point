@@ -195,7 +195,7 @@ function SkillMap({ skills }: { skills: ExtractedSkill[] }) {
   if (careers.length === 0) return null;
   return (
     <div className="grid gap-6 rounded-xl border border-border bg-background p-5 lg:grid-cols-2">
-      <div>
+      <div className="min-w-0">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
           <Layers className="h-4 w-4 text-primary" aria-hidden /> How your skills connect
         </div>
@@ -232,7 +232,7 @@ function SkillMap({ skills }: { skills: ExtractedSkill[] }) {
           </table>
         </div>
       </div>
-      <div>
+      <div className="min-w-0">
         <div className="mb-3 text-sm font-semibold text-foreground">What each skill brings</div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">

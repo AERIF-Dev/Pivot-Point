@@ -203,7 +203,7 @@ async function runOperation(apiKey: string, req: AnalyzeRequest): Promise<Respon
         "Your previous reply was not a single valid JSON object matching the shape. Reply again with ONLY the JSON object.";
     }
   }
-  return fail("bad_ai_output", "Gemma 4 returned a response LifePath could not read. Please try again.", 502);
+  return fail("bad_ai_output", "Gemma 4 returned a response PivotPoint could not read. Please try again.", 502);
 }
 
 export async function handleAnalyze(request: Request, env: AnalyzeEnv): Promise<Response> {

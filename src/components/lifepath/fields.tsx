@@ -77,8 +77,9 @@ export function NumberField({
             setText(e.target.value);
             const n = Number(e.target.value);
             if (e.target.value === "") onChange(0);
-            else if (Number.isFinite(n)) onChange(max != null ? Math.min(max, n) : n);
+            else if (Number.isFinite(n)) onChange(Math.max(min, max != null ? Math.min(max, n) : n));
           }}
+          onBlur={() => setText(String(value))}
           className={cn("tabular h-10 bg-card", prefix && "pl-7", suffix && "pr-14")}
         />
         {suffix ? (

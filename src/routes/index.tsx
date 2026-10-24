@@ -76,11 +76,11 @@ function Home() {
                 </Link>
               </Button>
               <Button size="lg" variant="hero-outline" onClick={journey.start}>
-                <PlayCircle aria-hidden /> Try the Live Demo
+                <PlayCircle aria-hidden /> Try Sample Journey
               </Button>
             </div>
             <p className="flex items-center gap-2 text-xs text-navy-muted">
-              <ShieldCheck className="h-4 w-4" aria-hidden /> No account. Your data stays in this browser.
+              <ShieldCheck className="h-4 w-4" aria-hidden /> No account. Saved locally; AI receives selected details only when you ask.
             </p>
           </div>
 
