@@ -56,7 +56,8 @@ async function callGemma(apiKey: string, prompt: string): Promise<GemmaResult> {
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 8192 },
+        // Gemma 4 thinking: "minimal" = off, "high" = on. Off keeps answers fast for interactive use.
+        generationConfig: { temperature: 0.4, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: "minimal" } },
       }),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
