@@ -312,11 +312,13 @@ function ChangeCard({
   rank,
   applied,
   onApply,
+  onValue,
 }: {
   e: EvaluatedChange;
   rank?: number;
   applied: boolean;
   onApply: (value: number | null) => void;
+  onValue: (value: number) => void;
 }) {
   const { def, value, impact } = e;
   const p = def.param;
