@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FinancesRouteImport } from './routes/finances'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiAnalyzeRouteImport } from './routes/api/analyze'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +20,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinancesRoute = FinancesRouteImport.update({
+  id: '/finances',
+  path: '/finances',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkillsRoute = SkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
@@ -31,31 +43,39 @@ const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/finances': typeof FinancesRoute
   '/profile': typeof ProfileRoute
+  '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/finances': typeof FinancesRoute
   '/profile': typeof ProfileRoute
+  '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/finances': typeof FinancesRoute
   '/profile': typeof ProfileRoute
+  '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile' | '/api/analyze'
+  fullPaths: '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/api/analyze'
-  id: '__root__' | '/' | '/profile' | '/api/analyze'
+  to: '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
+  id: '__root__' | '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FinancesRoute: typeof FinancesRoute
   ProfileRoute: typeof ProfileRoute
+  SkillsRoute: typeof SkillsRoute
   ApiAnalyzeRoute: typeof ApiAnalyzeRoute
 }
 
@@ -68,11 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/finances': {
+      id: '/finances'
+      path: '/finances'
+      fullPath: '/finances'
+      preLoaderRoute: typeof FinancesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skills': {
+      id: '/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof SkillsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/analyze': {
@@ -87,7 +121,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FinancesRoute: FinancesRoute,
   ProfileRoute: ProfileRoute,
+  SkillsRoute: SkillsRoute,
   ApiAnalyzeRoute: ApiAnalyzeRoute,
 }
 export const routeTree = rootRouteImport
