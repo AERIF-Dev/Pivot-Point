@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FinancesRouteImport } from './routes/finances'
+import { Route as JobLabRouteImport } from './routes/job-lab'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiAnalyzeRouteImport } from './routes/api/analyze'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const FinancesRoute = FinancesRouteImport.update({
   id: '/finances',
   path: '/finances',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobLabRoute = JobLabRouteImport.update({
+  id: '/job-lab',
+  path: '/job-lab',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -44,6 +50,7 @@ const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
+  '/job-lab': typeof JobLabRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
+  '/job-lab': typeof JobLabRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
@@ -59,21 +67,31 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/finances': typeof FinancesRoute
+  '/job-lab': typeof JobLabRoute
   '/profile': typeof ProfileRoute
   '/skills': typeof SkillsRoute
   '/api/analyze': typeof ApiAnalyzeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
+  fullPaths:
+    '/' | '/finances' | '/job-lab' | '/profile' | '/skills' | '/api/analyze'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
-  id: '__root__' | '/' | '/finances' | '/profile' | '/skills' | '/api/analyze'
+  to: '/' | '/finances' | '/job-lab' | '/profile' | '/skills' | '/api/analyze'
+  id:
+    | '__root__'
+    | '/'
+    | '/finances'
+    | '/job-lab'
+    | '/profile'
+    | '/skills'
+    | '/api/analyze'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FinancesRoute: typeof FinancesRoute
+  JobLabRoute: typeof JobLabRoute
   ProfileRoute: typeof ProfileRoute
   SkillsRoute: typeof SkillsRoute
   ApiAnalyzeRoute: typeof ApiAnalyzeRoute
@@ -93,6 +111,13 @@ declare module '@tanstack/react-router' {
       path: '/finances'
       fullPath: '/finances'
       preLoaderRoute: typeof FinancesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/job-lab': {
+      id: '/job-lab'
+      path: '/job-lab'
+      fullPath: '/job-lab'
+      preLoaderRoute: typeof JobLabRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -122,6 +147,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FinancesRoute: FinancesRoute,
+  JobLabRoute: JobLabRoute,
   ProfileRoute: ProfileRoute,
   SkillsRoute: SkillsRoute,
   ApiAnalyzeRoute: ApiAnalyzeRoute,
