@@ -32,12 +32,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/job-lab")({
   head: () => ({
     meta: [
-      { title: "Job Decision Lab — Can I actually take this job? | LifePath AI" },
+      { title: "Job Decision Lab — Can I actually take this job? | PivotPoint" },
       {
         name: "description",
         content: "Compare a job offer with your current job on take-home pay, new costs, commute time, schedule conflicts, and break-even wage.",
       },
-      { property: "og:title", content: "Job Decision Lab — LifePath AI" },
+      { property: "og:title", content: "Job Decision Lab — PivotPoint" },
       { property: "og:description", content: "Higher pay doesn't always mean more money left over. See the real difference." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -93,7 +93,7 @@ function JobLabPage() {
                   ) : null}
                   <p className="max-w-2xl text-sm leading-relaxed text-foreground/85">{c.explanation}</p>
                   <p className="text-xs text-muted-foreground">
-                    LifePath never tells you to accept or reject a job. This is an estimate based on your assumptions.
+                    PivotPoint never tells you to accept or reject a job. This is an estimate based on your assumptions.
                   </p>
                 </div>
               </div>

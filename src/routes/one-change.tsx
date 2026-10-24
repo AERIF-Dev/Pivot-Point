@@ -29,12 +29,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/one-change")({
   head: () => ({
     meta: [
-      { title: "One Change Away — Remove the barrier | LifePath AI" },
+      { title: "One Change Away — Remove the barrier | PivotPoint" },
       {
         name: "description",
         content: "Test changes like a negotiated wage, a later shift, or cheaper transportation and see exactly what each one unlocks.",
       },
-      { property: "og:title", content: "One Change Away — LifePath AI" },
+      { property: "og:title", content: "One Change Away — PivotPoint" },
       {
         property: "og:description",
         content: "Sometimes the next step isn't a new job. It's removing the barrier that makes a better opportunity possible.",

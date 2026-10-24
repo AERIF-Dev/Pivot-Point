@@ -9,12 +9,12 @@ import { GEMMA_MODEL } from "@/lib/ai/contract";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "How LifePath AI works — Privacy, AI, and calculations" },
+      { title: "How PivotPoint works — Privacy, AI, and calculations" },
       {
         name: "description",
-        content: "How LifePath AI calculates results, when it uses Gemma 4, what data leaves your browser, and its limits.",
+        content: "How PivotPoint calculates results, when it uses Gemma 4, what data leaves your browser, and its limits.",
       },
-      { property: "og:title", content: "How LifePath AI works" },
+      { property: "og:title", content: "How PivotPoint works" },
       { property: "og:description", content: "Deterministic math, user-initiated Gemma 4 analysis, and browser-only storage." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -34,8 +34,8 @@ function AboutPage() {
     <>
       <PageHeader
         eyebrow="About"
-        title="How LifePath AI works"
-        description="LifePath helps people make informed career, financial, and life decisions by connecting real skills, real costs, and real schedules."
+        title="How PivotPoint works"
+        description="PivotPoint helps people make informed career, financial, and life decisions by connecting real skills, real costs, and real schedules."
         actions={<AiStatusBadge />}
       />
       <PageBody>
@@ -73,7 +73,7 @@ function AboutPage() {
           </Panel>
         </div>
 
-        <Panel title="Detroit-area resources" description="External, official websites. LifePath does not verify that any program fits your situation." icon={<ExternalLink className="h-4 w-4" />}>
+        <Panel title="Detroit-area resources" description="External, official websites. PivotPoint does not verify that any program fits your situation." icon={<ExternalLink className="h-4 w-4" />}>
           <div className="grid gap-3 sm:grid-cols-3">
             {RESOURCES.map((r) => (
               <a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-border bg-background p-4 transition-colors hover:border-primary/50">
@@ -90,7 +90,7 @@ function AboutPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <Panel title="Important limits" icon={<ShieldCheck className="h-4 w-4" />}>
             <p className="text-sm leading-relaxed text-foreground/85">
-              LifePath AI is educational decision support — not professional financial, legal, or employment advice. It does
+              PivotPoint is educational decision support — not professional financial, legal, or employment advice. It does
               not access credit reports, determine loan or benefit eligibility, or tell you to accept or reject a job. Real
               taxes, benefits, and schedules can change outcomes.
             </p>
